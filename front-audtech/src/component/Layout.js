@@ -1,9 +1,12 @@
 import React from 'react';
-import {Layout, Menu} from 'antd';
+import {BrowserRouter as Router, Route} from "react-router-dom";
+import {Button, Layout, Menu, message} from 'antd';
 import RegistrationModal from './RegisterModal'
-import  DataUpload from  './DataUpload'
+import DataUpload from './DataUpload'
+import LoginModal from './LoginModal'
+import axios from "axios";
 
-const {Header, Content, Footer} = Layout;
+const {Content, Footer} = Layout;
 
 export default class LayoutDetail extends React.Component {
     constructor(props) {
@@ -13,28 +16,43 @@ export default class LayoutDetail extends React.Component {
         }
     }
 
+    logout() {
+        axios.post(`http://127.0.0.1:8000/logout/`).then((res) => {
+            message.success(`Logout Successfully`)
+        })
+    }
+
     render() {
         return (
             <>
-                <Header style={{background:'#005fff'}}>
-                    <Menu
-                        theme="light"
-                        mode="horizontal"
-                        style={{lineHeight: '64px'}}
-                    >
-                        <Menu.Item key="1"> <RegistrationModal/></Menu.Item>
-                        <Menu.Item key="2">Create User </Menu.Item>
-                        <Menu.Item key="3">Create Something</Menu.Item>
-                    </Menu>
-                </Header>
+
+                <div className="logo"/>
+                <Menu
+                    theme="light"
+                    mode="horizontal"
+                    style={{lineHeight: '64px'}}
+                >
+                    <Menu.Item key="1"><RegistrationModal/></Menu.Item>
+                    <Menu.Item key="2"><LoginModal/></Menu.Item>
+                    <Menu.Item key="3">
+                        <Button type="primary" key="4" onClick={this.logout}>
+                            Logout
+                        </Button>
+                    </Menu.Item>
+                </Menu>
+
                 <Layout className="layout">
-                    <Content style={{padding: '0 50px', margin: '16px 0'}}>
-                        <div style={{background: '#fff', minHeight: 600}}>
-                            <DataUpload/>
-                        </div>
+                    <Content style={{padding: '0 50px', marginTop: 15}}>
+                        <Router>
+                            <div style={{background: '#fff', minHeight: 600}}>
+                                <Route exact path='/' component={DataUpload}/>
+                            </div>
+                        </Router>
                     </Content>
-                    <Footer style={{textAlign: 'center', fontSize: '10px'}}>CA Hand Design ©2018 Created by Rishitosh
-                        Guha</Footer>
+                    <Footer style={{textAlign: 'center', fontSize: '10px'}}>
+                        CA Hand Design ©2018 Created by Rishitosh
+                        Guha
+                    </Footer>
                 </Layout>
             </>
         );

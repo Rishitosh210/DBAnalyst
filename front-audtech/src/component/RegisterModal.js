@@ -1,5 +1,5 @@
 import React from 'react'
-import {Button, Form, Icon, Input, Modal, Tooltip,} from 'antd';
+import {Button, Drawer, Form, Icon, Input, message, Tooltip,} from 'antd';
 import axios from "axios";
 
 const formItemLayout = {
@@ -12,25 +12,12 @@ const formItemLayout = {
         sm: {span: 16},
     },
 };
-const tailFormItemLayout = {
-    wrapperCol: {
-        xs: {
-            span: 24,
-            offset: 0,
-        },
-        sm: {
-            span: 16,
-            offset: 8,
-        },
-    },
-};
 
 class RegistrationModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             confirmDirty: false,
-            loading: false,
             visible: false,
         };
     }
@@ -39,14 +26,19 @@ class RegistrationModal extends React.Component {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
-                axios.post(`http://127.0.0.1:8000/register/`, values, {'Content-Type': 'application/json'}).then((res) => {
-                    //on success
-                    console.log('Received values of form: ', values);
-                    console.log("done", res)
-                }).catch((error) => {
-                    console.log(error.response)
-                    //on error
-                });
+                axios.post(`http://127.0.0.1:8000/api/user/list/`, values, {'Content-Type': 'application/json'})
+                    .then((res) => {
+                        //on success
+                        this.setState({
+                           visible:false
+                        });
+                        message.success("Register has been completed " +
+                            "successfully "+values.username)
+                    })
+                    .catch((error) => {
+                        console.log(error.response)
+                        //on error
+                    });
             } else {
                 console.log(err, "bhosdhika")
             }
@@ -59,9 +51,9 @@ class RegistrationModal extends React.Component {
         this.setState({confirmDirty: this.state.confirmDirty || !!value});
     };
 
-    showModal = () => {
+    showToggle = () => {
         this.setState({
-            visible: true,
+            visible: !this.state.visible,
         });
     };
     compareToFirstPassword = (rule, value, callback) => {
@@ -82,38 +74,24 @@ class RegistrationModal extends React.Component {
         callback();
     };
 
-    handleOk = () => {
-        this.setState({loading: true});
-        setTimeout(() => {
-            this.setState({loading: false});
-        }, 3000);
-    };
-
-    handleCancel = () => {
-        this.setState({visible: false});
-    };
-
     render() {
-        const {visible, loading} = this.state;
+        const {visible} = this.state;
         const {getFieldDecorator} = this.props.form;
 
         return (
             <>
-                <Button type="primary" onClick={this.showModal}>
+                <Button type="primary" onClick={this.showToggle}>
                     Register Yourself
                 </Button>
-                <Modal
+                <Drawer
+                    title="Register YourSelf"
+                    placement="right"
+                    closable={true}
+                    width={420}
+                    onClose={this.showToggle}
                     visible={visible}
-                    title="Register Please "
-                    onOk={this.handleOk}
-                    onCancel={this.handleCancel}
-                    footer={[
-                        <Button key="back" onClick={this.handleCancel}>
-                            Return
-                        </Button>
-                    ]}
                 >
-                    <Form {...formItemLayout} hideRequiredMark={true} onSubmit={this.handleSubmit}>
+                    <Form {...formItemLayout} hideRequiredMark={true}>
                         <Form.Item label="E-mail">
                             {getFieldDecorator('username', {
                                 rules: [
@@ -166,13 +144,13 @@ class RegistrationModal extends React.Component {
                                 rules: [{required: true, message: 'Please input your nickname!', whitespace: true}],
                             })(<Input/>)}
                         </Form.Item>
-                        <Form.Item {...tailFormItemLayout}>
-                            <Button key="submit" htmlType="submit" type="primary" loading={loading}>
+                        <Form.Item>
+                            <Button key="submit" htmlType="submit" type="primary" onClick={this.handleSubmit}>
                                 Submit
                             </Button>
                         </Form.Item>
                     </Form>
-                </Modal>
+                </Drawer>
             </>
         );
     }

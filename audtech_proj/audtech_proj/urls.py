@@ -13,14 +13,25 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from audtech_app import views
 from django.contrib import admin
 from django.urls import path
-from audtech_app import views
+from rest_framework.urlpatterns import format_suffix_patterns
+
+urlpatterns = [
+
+]
+
+urlpatterns = format_suffix_patterns(urlpatterns)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', views.login,name="login"),
-    path('all-user/', views.GetAllUser.as_view(),name="all-user"),
-    path('register/', views.create_auth, name="register"),
-    path('upload-data/', views.process_file, name="upload-data"),
+    path('login/', views.login_view, name="login"),
+    path('logout/', views.logout_view, name="logout"),
+    # path('api/user/', views.UserCRUD),
+    path('api/user/list/', views.UserList.as_view()),
+    path('api/user/detail/<int:pk>/', views.UserDetail.as_view()),
+    path('api/user/update/<int:pk>/', views.UserUpdate.as_view()),
+    path('api/user/delete/<int:pk>/', views.UserDelete.as_view()),
+    # path('upload-data/', views.process_file, name="upload-data"),
 ]
